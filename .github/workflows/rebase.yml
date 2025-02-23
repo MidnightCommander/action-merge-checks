@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 5
 
     # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issue_comment
-    if: github.event.issue.pull_request && github.event.comment.body == '/rebase'
+    if: github.event.issue.pull_request && github.event.comment.body == '/rebase' && github.event.comment.author_association == 'MEMBER'
 
     permissions:
       contents: read
