@@ -5,6 +5,7 @@ description = "Midnight Commander's GitHub merge checks"
 authors = [
     { name = "Yury V. Zaytsev", email = "yury@shurup.com" }
 ]
+readme = "README.md"
 license = "MIT"
 
 requires-python = ">=3.12"
