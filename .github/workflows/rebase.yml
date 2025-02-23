@@ -32,6 +32,8 @@ jobs:
         run: |
           gh pr checkout ${{ github.event.issue.number }}
 
+      # Warning: beware of running any user-injected content from this point on (CWE-829)!
+
       - name: Rebase and push
         run: |
           git config user.name 'github-actions[bot]'
