@@ -3,6 +3,9 @@
 name: Merge checks
 
 on:
+  push:
+    branches:
+      - "**"
   pull_request_target:
 
 jobs:
