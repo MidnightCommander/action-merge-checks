@@ -20,6 +20,8 @@ runs:
 
   steps:
     - uses: astral-sh/setup-uv@v5
+      with:
+        cache-dependency-glob: '${{ github.action_path }}/uv.lock'
 
     - run: uv run --project "${{ github.action_path }}" merge_checks_runner
       shell: sh
