@@ -24,7 +24,7 @@ def test_happy_path(mock):
 
 
 def test_revert_commit_passes_checks(mock):
-    mock.commit.commit.message = 'Revert "feat(compenent): subject"'
+    mock.commit.commit.message = 'Revert "feat(component): subject"'
     mock.commit.parents = (Mock(),)
 
     assert commit_checks.get_commit_checks_result(commits=(mock.commit,)) == (True, "All checks passed")
@@ -48,7 +48,24 @@ def test_squash_found(mock):
     )
 
 
-#
+@pytest.mark.parametrize(
+    "attribution",
+    [
+        "Co-Authored-By: Claude Opus 5.5",
+        "Co-authored-by: GitHub Copilot",
+        "CO-AUTHORED-BY: OpenAI ChatGPT",
+        "co-authored-by: claude",
+    ],
+)
+def test_invalid_llm_attributions_found(mock, attribution):
+    mock.commit.commit.message = f"feat(component): subject\n\n{attribution}"
+
+    assert commit_checks.get_commit_checks_result(commits=(mock.commit,)) == (
+        False,
+        "Found 1 commit(s) with invalid LLM attributions, use `Assisted-By: Model X.Y`",
+    )
+
+
 def test_merge_commit_found(mock):
     mock.commit.commit.message = "feat(component): subject"
     mock.commit.parents = (Mock(), Mock())

@@ -57,6 +57,23 @@ def get_commit_checks_result(commits: Sequence[Commit]) -> tuple[bool, str]:
     else:
         logger.info("No fixups or squashes found, check passed!")
 
+    invalid_llm_attributions = sum(
+        1
+        for commit_message in messages
+        if any(
+            f"Co-Authored-By: {llm}".lower() in commit_message.lower()
+            for llm in ("Claude", "GitHub Copilot", "OpenAI ChatGPT")
+        )
+    )
+
+    if invalid_llm_attributions:
+        return (
+            False,
+            f"Found {invalid_llm_attributions} commit(s) with invalid LLM attributions, use `Assisted-By: Model X.Y`",
+        )
+    else:
+        logger.info("No invalid LLM attributions found, check passed!")
+
     if has_merge_commits(commits):
         return False, "Contains merge commits"
     else:
