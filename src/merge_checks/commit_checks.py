@@ -4,6 +4,8 @@ from collections.abc import Sequence
 from github.Commit import Commit
 from github.Repository import Repository
 
+logger = logging.getLogger(__name__)
+
 LOGGING_PREFIX = "\n  "
 
 
@@ -16,17 +18,17 @@ def get_commits(repository: Repository, base_sha: str, head_hash: str) -> Sequen
 
 
 def get_commit_messages(commits: Sequence[Commit]) -> Sequence[str]:
-    logging.info("Getting commit messages...")
+    logger.info("Getting commit messages...")
     return tuple(commit.commit.message for commit in commits)
 
 
 def get_subject_markers(messages: Sequence[str]) -> Sequence[str]:
-    logging.info("Getting subject markers...")
+    logger.info("Getting subject markers...")
     return tuple(strip_allowed_markers(line).split(maxsplit=1)[0] for line in messages)
 
 
 def has_merge_commits(commits: Sequence[Commit]) -> bool:
-    logging.info("Checking for merge commits...")
+    logger.info("Checking for merge commits...")
     return any(len(parents) > 1 for parents in tuple(commit.parents for commit in commits))
 
 
@@ -40,7 +42,7 @@ def has_duplicated_commit_messages(messages: Sequence[str]) -> Sequence[str]:
 
 def get_commit_checks_result(commits: Sequence[Commit]) -> tuple[bool, str]:
     messages = get_commit_messages(commits)
-    logging.info(
+    logger.info(
         f"Found the following commit messages in branch:{LOGGING_PREFIX}{LOGGING_PREFIX.join(messages)}",
     )
 
@@ -53,15 +55,15 @@ def get_commit_checks_result(commits: Sequence[Commit]) -> tuple[bool, str]:
     if fixups or squashes:
         return False, f"{fixups} fixup and {squashes} squash commits found"
     else:
-        logging.info("No fixups or squashes found, check passed!")
+        logger.info("No fixups or squashes found, check passed!")
 
     if has_merge_commits(commits):
         return False, "Contains merge commits"
     else:
-        logging.info("Branch does not contain merge commits, check passed!")
+        logger.info("Branch does not contain merge commits, check passed!")
 
     if duplicated_messages := has_duplicated_commit_messages(messages):
-        logging.info(
+        logger.info(
             f"Found duplicated commit message(s): {LOGGING_PREFIX}{LOGGING_PREFIX.join(duplicated_messages)}",
         )
         return False, "Duplicated commit messages found"

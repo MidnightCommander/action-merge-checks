@@ -9,6 +9,8 @@ from github.Repository import Repository
 from merge_checks.commit_checks import get_base_sha, get_commit_checks_result, get_commits
 from merge_checks.commit_status_setter import set_commit_status
 
+logger = logging.getLogger(__name__)
+
 STATUS_NAME = "Merge checks / Result"
 STATUS_DESCRIPTION = "Merge checks running"
 
@@ -71,13 +73,13 @@ def run():
     base_sha = get_base_sha(repository=repository)
 
     if commit.commit_sha == base_sha:
-        logging.warning(f"HEAD identical with {repository.default_branch}, no commits to check")
+        logger.warning(f"HEAD identical with {repository.default_branch}, no commits to check")
         checks_passed, summary = (True, "No commits to check")
     else:
         checks_passed, summary = get_commit_checks_result(
             commits=get_commits(repository=repository, base_sha=base_sha, head_hash=commit.commit_sha),
         )
-    logging.info(f"Merge checks summary: {summary}")
+    logger.info(f"Merge checks summary: {summary}")
 
     set_commit_status(
         **(asdict(commit) | asdict(status)),
